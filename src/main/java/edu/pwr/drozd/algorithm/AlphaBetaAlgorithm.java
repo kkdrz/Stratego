@@ -5,9 +5,11 @@ import edu.pwr.drozd.evaluator.BoardStateEvaluator;
 
 import java.util.LinkedList;
 
-public class MinMaxAlgorithm implements StrategoAI {
+public class AlphaBetaAlgorithm {
 
     public int[] nextMove(
+            int alpha,
+            int beta,
             int[][] gameBoard,
             boolean maximize,
             int currentPlayerNumber,
@@ -33,21 +35,30 @@ public class MinMaxAlgorithm implements StrategoAI {
             for (int[] move : possibleMoves) {
                 gameBoard[move[0]][move[1]] = maximize ? currentPlayerNumber : opponentNumber;
                 if (maximize) {
-                    currentScore = nextMove(gameBoard, false, currentPlayerNumber, opponentNumber, depth - 1, cellSelector, stateEvaluator)[0];
+                    currentScore = nextMove(alpha, beta, gameBoard, false, currentPlayerNumber, opponentNumber, depth - 1, cellSelector, stateEvaluator)[0];
                     if (currentScore > bestScore) {
                         bestScore = currentScore;
                         bestRow = move[0];
                         bestColumn = move[1];
                     }
+                    if (alpha < bestScore) {
+                        alpha = bestScore;
+                    }
                 } else {
-                    currentScore = nextMove(gameBoard, true, currentPlayerNumber, opponentNumber, depth - 1, cellSelector, stateEvaluator)[0];
+                    currentScore = nextMove(alpha, beta, gameBoard, true, currentPlayerNumber, opponentNumber, depth - 1, cellSelector, stateEvaluator)[0];
                     if (currentScore < bestScore) {
                         bestScore = currentScore;
                         bestRow = move[0];
                         bestColumn = move[1];
                     }
+                    if (beta > bestScore) {
+                        beta = bestScore;
+                    }
                 }
                 gameBoard[move[0]][move[1]] = 0;
+                if (alpha >= beta) {
+                    break;
+                }
             }
         }
         return new int[]{bestScore, bestRow, bestColumn};
