@@ -50,9 +50,9 @@ export default {
     };
   },
   methods: {
-      onGridSizeChanged: function() {
-          Event.$emit('gridSizeChanged', this.gridSize);
-      }
+    onGridSizeChanged: function() {
+      Event.$emit("gridSizeChanged", this.gridSize);
+    }
   }
 };
 </script>
