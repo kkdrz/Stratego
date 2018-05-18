@@ -28,6 +28,7 @@ export default {
   },
   methods: {
     clearCells: function(size) {
+      Event.$emit("clearCells");
       this.cells = new Array(size);
       for (var i = 0; i < size; i++) {
         this.cells[i] = new Array(size);

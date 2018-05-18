@@ -1,8 +1,5 @@
 <template>
-	<td class="cell" @click="strike">
-        <div class="content">
-            {{mark}}
-        </div>
+	<td class="cell" :class="cellClass" @mouseover="onMouseOver" @mouseout="onMouseOut" @click="strike">
     </td>
 </template>
 
@@ -12,7 +9,8 @@ export default {
   data() {
     return {
       frozen: false,
-      mark: ""
+      mark: "",
+      mouseOver: false
     };
   },
 
@@ -20,19 +18,41 @@ export default {
     strike() {
       if (!this.frozen) {
         this.mark = this.$parent.activePlayer;
-		this.frozen = true;
+        this.frozen = true;
         Event.$emit("strike", this.x, this.y);
       }
+    },
+    onMouseOver() {
+      this.mouseOver = true;
+    },
+    onMouseOut() {
+      this.mouseOver = false;
     }
   },
 
   created() {
-    Event.$on("clearCell", () => {
+    Event.$on("clearCells", () => {
       this.mark = "";
       this.frozen = false;
     });
 
     Event.$on("freeze", () => (this.frozen = true));
+  },
+  computed: {
+    cellClass: function() {
+      return {
+        markA:
+          this.mark === "O" ||
+          (this.mouseOver === true &&
+            this.$parent.activePlayer === "O" &&
+            !this.frozen),
+        markB:
+          this.mark === "X" ||
+          (this.mouseOver === true &&
+            this.$parent.activePlayer === "X" &&
+            !this.frozen)
+      };
+    }
   }
 };
 </script>
@@ -40,12 +60,10 @@ export default {
 <style>
 .cell {
   position: relative;
-  width: 100px;
+  width: 50px;
+  max-width: 50px;
   border: white solid 1px;
-}
-
-.cell:hover {
-  background-color: #255255;
+  background-color: darkgray;
 }
 
 .cell:after {
@@ -54,12 +72,11 @@ export default {
   padding-bottom: 100%;
 }
 
-.content {
-  position: absolute;
-  text-align: center;
-  font-size: 20px;
-  font-family: "Gochi Hand", sans-serif;
-  width: 100%;
-  height: 100%;
+.markA {
+  background-color: rgb(0, 0, 236);
+}
+
+.markB {
+  background-color: rgb(255, 0, 0);
 }
 </style>
