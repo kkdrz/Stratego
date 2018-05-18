@@ -42,14 +42,14 @@ export default {
     cellClass: function() {
       return {
         markA:
-          this.mark === "O" ||
+          this.mark === "1" ||
           (this.mouseOver === true &&
-            this.$parent.activePlayer === "O" &&
+            this.$parent.activePlayer === "1" &&
             !this.frozen),
         markB:
-          this.mark === "X" ||
+          this.mark === "2" ||
           (this.mouseOver === true &&
-            this.$parent.activePlayer === "X" &&
+            this.$parent.activePlayer === "2" &&
             !this.frozen)
       };
     }

@@ -16,7 +16,7 @@ export default {
   },
   data() {
     return {
-      activePlayer: "O",
+      activePlayer: "2",
       gameStatus: "turn",
       cells: [[]]
     };
@@ -39,6 +39,7 @@ export default {
     },
     changePlayer() {
       this.activePlayer = this.nonActivePlayer;
+      Event.$emit('changeActivePlayer', this.activePlayer);
     },
     changeGameStatus() {}
   },
@@ -46,17 +47,19 @@ export default {
     this.clearCells(this.size);
 
     Event.$on("strike", (x, y) => {
-      this.cells[x][y] = this.activePlayer === "O" ? 1 : 2;
+      this.cells[x][y] = this.activePlayer === "1" ? 1 : 2;
       this.gameStatus = this.changeGameStatus();
       this.changePlayer();
     });
+
+    this.changePlayer();
   },
   computed: {
     nonActivePlayer() {
-      if (this.activePlayer === "O") {
-        return "X";
+      if (this.activePlayer === "1") {
+        return "2";
       }
-      return "O";
+      return "1";
     }
   },
   components: { Cell }

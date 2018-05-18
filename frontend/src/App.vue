@@ -4,11 +4,11 @@
       <b-col cols="12"><info-bar :score1="player1Score" :score2="player2Score"></info-bar></b-col>
     </b-row>
     <b-row>
-      <b-col cols="3"><settings heading="Player 1" :settings="player1Settings"></settings></b-col>
+      <b-col cols="3"><settings :heading="player1Name" :playerNumber="1" :settings="player1Settings"></settings></b-col>
       <b-col cols="6">
         <board :size="boardSize"></board>
       </b-col>
-      <b-col cols="3"><settings heading="Player 2" :settings="player2Settings"></settings></b-col>
+      <b-col cols="3"><settings :heading="player2Name" :playerNumber="2" :settings="player2Settings"></settings></b-col>
       
     </b-row>
   </b-container>
@@ -27,13 +27,19 @@
         player1Score: 0,
         player2Score: 0,
         player1Settings: [],
-        player2Settings: []
+        player2Settings: [],
+        player1Name: "Player 1",
+        player2Name: "Player 2"
       };
     },
     created() {
       Event.$on("gridSizeChanged", boardSize => {
         this.boardSize = Number(boardSize);
+        Event.$emit('changeActivePlayer', 1)
       });
+    },
+    methods: {
+      
     },
     components: {
       Board,
