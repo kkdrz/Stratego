@@ -5,15 +5,15 @@ import edu.pwr.drozd.evaluator.BoardStateEvaluator;
 
 import java.util.LinkedList;
 
-public class AlphaBetaAlgorithm {
+public class AlphaBetaAlgorithm implements StrategoAIAlgorithm {
 
     public int[] nextMove(
             int alpha,
             int beta,
             int[][] gameBoard,
             boolean maximize,
-            int currentPlayerNumber,
-            int opponentNumber,
+            int currentPlayer,
+            int opponentPlayer,
             int depth,
             CellSelector cellSelector,
             BoardStateEvaluator stateEvaluator) {
@@ -30,12 +30,12 @@ public class AlphaBetaAlgorithm {
         }
 
         if (depth == 0 || possibleMoves.isEmpty()) {
-            bestScore = stateEvaluator.evaluate(gameBoard, currentPlayerNumber);
+            bestScore = stateEvaluator.evaluate(gameBoard, currentPlayer);
         } else {
             for (int[] move : possibleMoves) {
-                gameBoard[move[0]][move[1]] = maximize ? currentPlayerNumber : opponentNumber;
+                gameBoard[move[0]][move[1]] = maximize ? currentPlayer : opponentPlayer;
                 if (maximize) {
-                    currentScore = nextMove(alpha, beta, gameBoard, false, currentPlayerNumber, opponentNumber, depth - 1, cellSelector, stateEvaluator)[0];
+                    currentScore = nextMove(alpha, beta, gameBoard, false, currentPlayer, opponentPlayer, depth - 1, cellSelector, stateEvaluator)[0];
                     if (currentScore > bestScore) {
                         bestScore = currentScore;
                         bestRow = move[0];
@@ -45,7 +45,7 @@ public class AlphaBetaAlgorithm {
                         alpha = bestScore;
                     }
                 } else {
-                    currentScore = nextMove(alpha, beta, gameBoard, true, currentPlayerNumber, opponentNumber, depth - 1, cellSelector, stateEvaluator)[0];
+                    currentScore = nextMove(alpha, beta, gameBoard, true, currentPlayer, opponentPlayer, depth - 1, cellSelector, stateEvaluator)[0];
                     if (currentScore < bestScore) {
                         bestScore = currentScore;
                         bestRow = move[0];
@@ -65,4 +65,15 @@ public class AlphaBetaAlgorithm {
     }
 
 
+    @Override
+    public int[] nextMove(
+            int[][] gameBoard,
+            int currentPlayer,
+            int opponentPlayer,
+            int depth,
+            CellSelector cellSelector,
+            BoardStateEvaluator stateEvaluator) {
+
+        return nextMove(Integer.MIN_VALUE, Integer.MAX_VALUE, gameBoard, true, currentPlayer, opponentPlayer, depth, cellSelector, stateEvaluator);
+    }
 }

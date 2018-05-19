@@ -4,10 +4,6 @@ const serveStatic = require('serve-static');
 
 let app = express();
 app.use(serveStatic(__dirname + "/dist"));
-app.route('/*')
-    .get(function(req, res) {
-          res.sendFile(path.join(__dirname + '/dist/index.html'));
-});
 
 module.exports = app;
 const port = process.env.PORT || 5000;
