@@ -10,7 +10,7 @@
 
 <script>
 import Cell from "./Cell.vue";
-import Game from "./Game.js";
+import Game from "../js/Game.js";
 
 export default {
   props: {
