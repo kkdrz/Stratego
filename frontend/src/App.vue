@@ -35,7 +35,17 @@
     created() {
       Event.$on("gridSizeChanged", boardSize => {
         this.boardSize = Number(boardSize);
+        this.player1Score = 0;
+        this.player2Score = 0;
         Event.$emit('changeActivePlayer', 1)
+      });
+
+      Event.$on("increaseScore", (player, score) => {
+        if(player === '1') {
+          this.player1Score += score;
+        } else if (player === '2') {
+          this.player2Score += score;
+        }
       });
     },
     methods: {

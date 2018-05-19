@@ -10,6 +10,8 @@
 
 <script>
 import Cell from "./Cell.vue";
+import Game from "./Game.js";
+
 export default {
   props: {
     size: Number
@@ -42,41 +44,16 @@ export default {
       Event.$emit("changeActivePlayer", this.activePlayer);
     },
     changeGameStatus(x, y) {
-      console.log(this.countPointsHorizontally(x, y));
-      this.countPointsVertically(x, y);
-      this.countPointsDiagonally(x, y);
-    },
-    countPointsHorizontally(x, y) {
-      var player = this.cells[x][y];
-      var lineClosed = true;
-      for (var i = 0; i < this.cells[x].length; i++) {
-        if (this.cells[x][i] === 0) {
-          lineClosed = false;
-        }
-      }
+      var newPoints =
+        Game.countPointsHorizontally(this.cells, x, y) +
+        Game.countPointsVertically(this.cells, x, y) +
+        Game.countPointsDiagonallyLeftToTop(this.cells, x, y) +
+        Game.countPointsDiagonallyLeftToBottom(this.cells, x, y);
 
-      var points = 1;
-      if (lineClosed) {
-        for (var i = y + 1; i < this.cells[x].length; i++) {
-          if (this.cells[x][i] === player) {
-            points++;
-          } else {
-            break;
-          }
+        if(newPoints > 1) {
+          Event.$emit("increaseScore", this.activePlayer, newPoints);
         }
-
-        for (var i = y - 1; i >= 0; i--) {
-          if (this.cells[x][i] === player) {
-            points++;
-          } else {
-            break;
-          }
-        }
-      }
-      return points >= 2 ? points : 0;
-    },
-    countPointsVertically() {},
-    countPointsDiagonally() {}
+    }
   },
   created() {
     this.clearCells(this.size);

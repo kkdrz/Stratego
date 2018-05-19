@@ -1,6 +1,6 @@
 <template>
 	<td class="cell" :class="cellClass" @mouseover="onMouseOver" @mouseout="onMouseOut" @click="strike">
-    {{x}}:{{y}}
+    <!-- {{x}}:{{y}} -->
     </td>
 </template>
 
