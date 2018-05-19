@@ -50,9 +50,13 @@ export default {
         Game.countPointsDiagonallyLeftToTop(this.cells, x, y) +
         Game.countPointsDiagonallyLeftToBottom(this.cells, x, y);
 
-        if(newPoints > 1) {
-          Event.$emit("increaseScore", this.activePlayer, newPoints);
-        }
+      if (newPoints > 1) {
+        Event.$emit("increaseScore", this.activePlayer, newPoints);
+      }
+      if (!Game.isMovePossible(this.cells)) {
+        console.log("move not possible")
+        Event.$emit("moveIsImpossible");
+      }
     }
   },
   created() {

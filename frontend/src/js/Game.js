@@ -113,21 +113,13 @@ function countPointsDiagonallyLeftToBottom(cells, x, y) {
   var diagonalClosed = true;
   var topDiagonal = y >= x;
   if (topDiagonal) {
-    for (
-      var i = 0, j = y - x;
-      j < cells.length && i < cells.length;
-      i++, j++
-    ) {
+    for (var i = 0, j = y - x; j < cells.length && i < cells.length; i++, j++) {
       if (cells[i][j] === 0) {
         diagonalClosed = false;
       }
     }
   } else {
-    for (
-      var i = x - y, j = 0;
-      i < cells.length && j < cells.length;
-      i++, j++
-    ) {
+    for (var i = x - y, j = 0; i < cells.length && j < cells.length; i++, j++) {
       if (cells[i][j] === 0) {
         diagonalClosed = false;
       }
@@ -163,9 +155,22 @@ function countPointsDiagonallyLeftToBottom(cells, x, y) {
   return points >= 2 ? points : 0;
 }
 
+function isMovePossible(cells) {
+  var possible = false;
+  for (var i = 0; i < cells.length; i++) {
+    for (var j = 0; j < cells.length; j++) {
+      if (Number(cells[i][j]) === Number(0)) {
+        possible = true;
+      }
+    }
+  }
+  return possible;
+}
+
 export default {
   countPointsVertically,
   countPointsHorizontally,
   countPointsDiagonallyLeftToTop,
-  countPointsDiagonallyLeftToBottom
+  countPointsDiagonallyLeftToBottom,
+  isMovePossible
 };

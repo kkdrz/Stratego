@@ -9,57 +9,73 @@
         <board :size="boardSize"></board>
       </b-col>
       <b-col cols="3"><settings :heading="player2Name" :playerNumber="2" :settings="player2Settings"></settings></b-col>
-      
     </b-row>
+    <b-modal hide-footer hide-header v-model="endGameModal">
+      {{modalMessage}}
+    </b-modal>
   </b-container>
 </template>
 
 <script>
-  import Board from "./components/Board.vue";
-  import Settings from "./components/Settings.vue";
-  import InfoBar from './components/InfoBar.vue'
+import Board from "./components/Board.vue";
+import Settings from "./components/Settings.vue";
+import InfoBar from "./components/InfoBar.vue";
 
-  export default {
-    name: "app",
-    data() {
-      return {
-        boardSize: 10,
-        player1Score: 0,
-        player2Score: 0,
-        player1Settings: [],
-        player2Settings: [],
-        player1Name: "Player 1",
-        player2Name: "Player 2"
-      };
-    },
-    created() {
-      Event.$on("gridSizeChanged", boardSize => {
-        this.boardSize = Number(boardSize);
-        this.player1Score = 0;
-        this.player2Score = 0;
-        Event.$emit('changeActivePlayer', 1)
-      });
+export default {
+  name: "app",
+  data() {
+    return {
+      boardSize: 10,
+      player1Score: 0,
+      player2Score: 0,
+      player1Settings: [],
+      player2Settings: [],
+      player1Name: "Player 1",
+      player2Name: "Player 2",
+      endGameModal: false,
+      modalMessage: ""
+    };
+  },
+  created() {
+    Event.$on("gridSizeChanged", boardSize => {
+      this.boardSize = Number(boardSize);
+      this.player1Score = 0;
+      this.player2Score = 0;
+      Event.$emit("changeActivePlayer", 1);
+    });
 
-      Event.$on("increaseScore", (player, score) => {
-        if(player === '1') {
-          this.player1Score += score;
-        } else if (player === '2') {
-          this.player2Score += score;
-        }
-      });
-    },
-    methods: {
-      
-    },
-    components: {
-      Board,
-      Settings,
-      InfoBar
-    }
-  };
+    Event.$on("increaseScore", (player, score) => {
+      if (player === "1") {
+        this.player1Score += score;
+      } else if (player === "2") {
+        this.player2Score += score;
+      }
+    });
 
+    Event.$on("moveIsImpossible", () => {
+      var message = "";
+      if (this.player1Score > this.player2Score) {
+        message = this.player1Name + " won the match!";
+      } else if (this.player2Score > this.player1Score) {
+        message = this.player2Name + " won the match!";
+      } else if (this.player2Score === this.player1Score) {
+        message = "Draw. There is no winner!";
+      } else {
+        message = "Something bad happened :(";
+      }
+
+      this.modalMessage = message;
+      this.endGameModal = true;
+    });
+  },
+  methods: {},
+  components: {
+    Board,
+    Settings,
+    InfoBar
+  }
+};
 </script>
 
 <style>
-
 </style>
