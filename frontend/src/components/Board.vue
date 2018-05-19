@@ -39,16 +39,51 @@ export default {
     },
     changePlayer() {
       this.activePlayer = this.nonActivePlayer;
-      Event.$emit('changeActivePlayer', this.activePlayer);
+      Event.$emit("changeActivePlayer", this.activePlayer);
     },
-    changeGameStatus() {}
+    changeGameStatus(x, y) {
+      console.log(this.countPointsHorizontally(x, y));
+      this.countPointsVertically(x, y);
+      this.countPointsDiagonally(x, y);
+    },
+    countPointsHorizontally(x, y) {
+      var player = this.cells[x][y];
+      var lineClosed = true;
+      for (var i = 0; i < this.cells[x].length; i++) {
+        if (this.cells[x][i] === 0) {
+          lineClosed = false;
+        }
+      }
+
+      var points = 1;
+      if (lineClosed) {
+        for (var i = y + 1; i < this.cells[x].length; i++) {
+          if (this.cells[x][i] === player) {
+            points++;
+          } else {
+            break;
+          }
+        }
+
+        for (var i = y - 1; i >= 0; i--) {
+          if (this.cells[x][i] === player) {
+            points++;
+          } else {
+            break;
+          }
+        }
+      }
+      return points >= 2 ? points : 0;
+    },
+    countPointsVertically() {},
+    countPointsDiagonally() {}
   },
   created() {
     this.clearCells(this.size);
 
     Event.$on("strike", (x, y) => {
       this.cells[x][y] = this.activePlayer === "1" ? 1 : 2;
-      this.gameStatus = this.changeGameStatus();
+      this.gameStatus = this.changeGameStatus(x, y);
       this.changePlayer();
     });
 

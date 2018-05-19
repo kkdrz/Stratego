@@ -32,39 +32,34 @@
 </template>
 
 <script>
-  export default {
-    props: ['heading', 'playerNumber'],
-    data() {
-      return {
-        player: "Human",
-        players: ["AI", "Human"],
-        selectedAlgorithm: "MinMax",
-        algorithms: ["MinMax", "AlphaBeta"],
-        selectedDepth: "3",
-        depths: ["1", "2", "3", "4", "5", "6", "7"],
-        color: 'dark'
-      };
-    },
-    created() {
-      Event.$on('changeActivePlayer', (player) => {
-        console.log("player " + player)
-        console.log("playernumber " + this.playerNumber)
-        console.log("on " + player === this.playerNumber)
-        if (Number(player) === Number(this.playerNumber)) {
-          this.color = 'info'
-        } else {
-          this.color = 'dark'
-        }
-      })
-    }
-  };
-
+export default {
+  props: ["heading", "playerNumber"],
+  data() {
+    return {
+      player: "Human",
+      players: ["AI", "Human"],
+      selectedAlgorithm: "MinMax",
+      algorithms: ["MinMax", "AlphaBeta"],
+      selectedDepth: "3",
+      depths: ["1", "2", "3", "4", "5", "6", "7"],
+      color: "dark"
+    };
+  },
+  created() {
+    Event.$on("changeActivePlayer", player => {
+      if (Number(player) === Number(this.playerNumber)) {
+        this.color = "info";
+      } else {
+        this.color = "dark";
+      }
+    });
+  }
+};
 </script>
 
 <style scoped>
-  .settings {
-    background-color: aquamarine;
-    padding: 10px;
-  }
-
+.settings {
+  background-color: aquamarine;
+  padding: 10px;
+}
 </style>
