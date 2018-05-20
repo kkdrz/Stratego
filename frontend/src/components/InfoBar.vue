@@ -26,7 +26,7 @@
     },
     methods: {
       onGridSizeChanged: function () {
-        Event.$emit("gridSizeChanged", this.gridSize);
+        Event.$emit("resetGame", this.gridSize);
       }
     }
   };

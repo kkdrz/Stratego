@@ -11,6 +11,7 @@
 <script>
 import Cell from "./Cell.vue";
 import Game from "../js/Game.js";
+import AI from "../api/api_config.js";
 
 export default {
   props: {
@@ -18,13 +19,36 @@ export default {
   },
   data() {
     return {
-      activePlayer: "2",
-      gameStatus: "turn",
+      activePlayer: 2,
+      players: [
+        {},
+        {
+          id: 1,
+          type: "Human",
+          name: "Player 1",
+          score: 0,
+          settings: {
+            algorithm: "MinMax",
+            depth: 3
+          }
+        },
+        {
+          id: 2,
+          type: "AI",
+          name: "Player 2",
+          score: 0,
+          settings: {
+            algorithm: "MinMax",
+            depth: 3
+          }
+        }
+      ],
       cells: [[]]
     };
   },
   watch: {
     size: function(newSize, oldSize) {
+      console.log("new size: " + newSize)
       this.clearCells(newSize);
     }
   },
@@ -40,43 +64,92 @@ export default {
       }
     },
     changePlayer() {
-      this.activePlayer = this.nonActivePlayer;
+      this.activePlayer = this.activePlayer === 1 ? 2 : 1;
       Event.$emit("changeActivePlayer", this.activePlayer);
     },
     changeGameStatus(x, y) {
-      var newPoints =
-        Game.countPointsHorizontally(this.cells, x, y) +
-        Game.countPointsVertically(this.cells, x, y) +
-        Game.countPointsDiagonallyLeftToTop(this.cells, x, y) +
-        Game.countPointsDiagonallyLeftToBottom(this.cells, x, y);
+      var horizontally = Game.countPointsHorizontally(this.cells, x, y);
+      var vertically = Game.countPointsVertically(this.cells, x, y);
+      var diagonallyLT = Game.countPointsDiagonallyLeftToTop(this.cells, x, y);
+      var diagonallyLB = Game.countPointsDiagonallyLeftToBottom(
+        this.cells,
+        x,
+        y
+      );
+
+      var newPoints = horizontally + vertically + diagonallyLT + diagonallyLB;
 
       if (newPoints > 1) {
-        Event.$emit("increaseScore", this.activePlayer, newPoints);
+        this.players[this.activePlayer].score += newPoints;
+        Event.$emit("playerDataChanged", this.players[this.activePlayer]);
       }
+
       if (!Game.isMovePossible(this.cells)) {
-        console.log("move not possible")
+        console.log("move not possible");
         Event.$emit("moveIsImpossible");
+      }
+    },
+    checkIfAINeeded() {
+      var currentPlayer = this.activePlayer;
+      if (this.players[currentPlayer].type === "AI") {
+        Event.$emit("disableUser");
+        var gameState = {
+          currentPlayer: this.activePlayer,
+          opponentPlayer: this.activePlayer === 1 ? 2 : 1,
+          algorithm: this.players[this.activePlayer].settings.algorithm,
+          depth: this.players[this.activePlayer].settings.depth,
+          board: this.cells,
+          cellSelector: "central",
+          stateEvaluator: "symbols_in_completed_lines"
+        };
+
+        AI.nextMove(gameState).then(response => {
+          if (this.players[currentPlayer].type === "AI") {
+            Event.$emit("markCell", response[1], response[2]);
+          } else {
+            Event.$emit("enableUser");
+          }
+        });
+      } else {
+        Event.$emit("enableUser");
       }
     }
   },
   created() {
     this.clearCells(this.size);
 
+     Event.$on("resetGame", (boardSize) => {
+       this.clearCells(boardSize);
+       this.players[1].score = 0
+       this.players[2].score = 0
+       Event.$emit("playerDataChanged", this.players[1])
+       Event.$emit("playerDataChanged", this.players[2])
+     });
+
     Event.$on("strike", (x, y) => {
-      this.cells[x][y] = this.activePlayer === "1" ? 1 : 2;
-      this.gameStatus = this.changeGameStatus(x, y);
+      this.cells[x][y] = this.activePlayer;
+      this.changeGameStatus(x, y);
       this.changePlayer();
+      this.checkIfAINeeded();
+    });
+
+    Event.$on("settingsChanged", (playerID, settings) => {
+      var oldType = this.players[playerID].type
+      this.players[playerID].type = settings.type;
+      this.players[playerID].settings.algorithm = settings.algorithm;
+      this.players[playerID].settings.depth = settings.depth;
+
+      if (playerID === this.activePlayer) {
+        if (oldType !=="AI" && settings.type === "AI") {
+          this.checkIfAINeeded();
+        } else if (oldType !== "AI"){
+          Event.$emit("enableUser");
+        }
+      }
     });
 
     this.changePlayer();
-  },
-  computed: {
-    nonActivePlayer() {
-      if (this.activePlayer === "1") {
-        return "2";
-      }
-      return "1";
-    }
+    this.checkIfAINeeded();
   },
   components: { Cell }
 };

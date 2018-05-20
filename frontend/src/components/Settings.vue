@@ -33,7 +33,7 @@
 
 <script>
 export default {
-  props: ["heading", "playerNumber"],
+  props: ["heading", "playerID"],
   data() {
     return {
       player: "Human",
@@ -46,13 +46,34 @@ export default {
     };
   },
   created() {
-    Event.$on("changeActivePlayer", player => {
-      if (Number(player) === Number(this.playerNumber)) {
+    Event.$on("changeActivePlayer", playerID => {
+      if (Number(playerID) === Number(this.playerID)) {
         this.color = "info";
       } else {
         this.color = "dark";
       }
     });
+    this.settingsChanged();
+  },
+  watch: {
+    selectedAlgorithm: function(after, before) {
+      this.settingsChanged();
+    },
+    selectedDepth: function(after, before) {
+      this.settingsChanged();
+    },
+    player: function(after, before) {
+      this.settingsChanged();
+    }
+  },
+  methods: {
+    settingsChanged() {
+      Event.$emit("settingsChanged", this.playerID, {
+        type: this.player,
+        algorithm: this.selectedAlgorithm,
+        depth: this.selectedDepth
+      });
+    }
   }
 };
 </script>

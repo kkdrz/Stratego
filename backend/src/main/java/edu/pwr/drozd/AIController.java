@@ -9,14 +9,12 @@ import edu.pwr.drozd.evaluator.BoardStateEvaluator;
 import edu.pwr.drozd.evaluator.SymbolsInCompletedLinesEvaluator;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class AIController {
 
+    @CrossOrigin(origins = { "*" })
     @RequestMapping(value = "/", method = RequestMethod.GET, produces = "application/json")
     public GameState hello() {
         GameState gs = new GameState();
@@ -31,6 +29,7 @@ public class AIController {
         return gs;
     }
 
+    @CrossOrigin(origins = { "*" })
     @RequestMapping(value = "/nextMove", method = RequestMethod.POST, produces = "application/json")
     public ResponseEntity<int[]> nextMove(@RequestBody GameState gameState) {
         StrategoAIAlgorithm ai = getAlgorithm(gameState);
@@ -62,9 +61,9 @@ public class AIController {
 
     private StrategoAIAlgorithm getAlgorithm(@RequestBody GameState gameState) {
         StrategoAIAlgorithm ai = null;
-        if ("minmax".equals(gameState.getAlgorithm())) {
+        if ("MinMax".equals(gameState.getAlgorithm())) {
             ai = new MinMaxAlgorithm();
-        } else if ("alphabeta".equals(gameState.getAlgorithm())) {
+        } else if ("AlphaBeta".equals(gameState.getAlgorithm())) {
             ai = new AlphaBetaAlgorithm();
         }
         return ai;
