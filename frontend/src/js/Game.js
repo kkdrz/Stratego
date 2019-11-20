@@ -167,10 +167,24 @@ function isMovePossible(cells) {
   return possible;
 }
 
+function countPoints(cells, x, y) {
+  var horizontally = this.countPointsHorizontally(cells, x, y);
+  var vertically = this.countPointsVertically(cells, x, y);
+  var diagonallyLT = this.countPointsDiagonallyLeftToTop(cells, x, y);
+  var diagonallyLB = this.countPointsDiagonallyLeftToBottom(cells, x, y);
+
+  var newPoints = horizontally > 1 ? horizontally : 0;
+  newPoints += vertically > 1 ? vertically : 0;
+  newPoints += diagonallyLT > 1 ? diagonallyLT : 0;
+  newPoints += diagonallyLB > 1 ? diagonallyLB : 0;
+  return newPoints;
+}
+
 export default {
   countPointsVertically,
   countPointsHorizontally,
   countPointsDiagonallyLeftToTop,
   countPointsDiagonallyLeftToBottom,
-  isMovePossible
+  isMovePossible,
+  countPoints
 };

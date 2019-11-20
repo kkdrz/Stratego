@@ -9,21 +9,35 @@
       <b-row text-center>
         <div class="col-12">
           <b-input-group prepend="Player" class="mb-2">
-            <b-form-select v-model="player" placeholder="Player type" :options="players"></b-form-select>
+            <b-form-select v-model="player" placeholder="Player type" :options="players" :disabled="this.disabled"></b-form-select>
           </b-input-group>
         </div>
       </b-row>
       <b-row text-center>
         <div class="col-12">
           <b-input-group v-if="player === 'AI'" prepend="Algorithm" class="mb-2">
-            <b-form-select v-model="selectedAlgorithm" :options="algorithms" />
+            <b-form-select v-model="selectedAlgorithm" :options="algorithms" :disabled="this.disabled"/>
           </b-input-group>
         </div>
       </b-row>
       <b-row text-center>
         <div class="col-12">
           <b-input-group v-if="player === 'AI'" prepend="Depth" class="mb-2">
-            <b-form-select v-model="selectedDepth" :options="depths" />
+            <b-form-select v-model="selectedDepth" :options="depths" :disabled="this.disabled"/>
+          </b-input-group>
+        </div>
+      </b-row>
+      <b-row text-center>
+        <div class="col-12">
+          <b-input-group v-if="player === 'AI'" prepend="Evaluator" class="mb-2">
+            <b-form-select v-model="selectedEvaluator" :options="evaluators" :disabled="this.disabled"/>
+          </b-input-group>
+        </div>
+      </b-row>
+      <b-row text-center>
+        <div class="col-12">
+          <b-input-group v-if="player === 'AI'" prepend="CellSelector" class="mb-2">
+            <b-form-select v-model="selectedCellSelector" :options="cellSelectors" :disabled="this.disabled" />
           </b-input-group>
         </div>
       </b-row>
@@ -33,20 +47,24 @@
 
 <script>
 export default {
-  props: ["heading", "playerID"],
+  props: ["heading", "playerID", "disabled"],
   data() {
     return {
       player: "Human",
       players: ["AI", "Human"],
-      selectedAlgorithm: "MinMax",
+      selectedAlgorithm: "AlphaBeta",
       algorithms: ["MinMax", "AlphaBeta"],
-      selectedDepth: "3",
-      depths: ["1", "2", "3", "4", "5", "6", "7"],
+      selectedDepth: 3,
+      depths: [1, 2, 3, 4, 5, 6, 7],
+      selectedEvaluator: "Symbols in completed lines",
+      evaluators: ["Symbols in completed lines", "Cluster of symbols"],
+      selectedCellSelector: "Central",
+      cellSelectors: ["Central", "Border"],
       color: "dark"
     };
   },
   created() {
-    Event.$on("changeActivePlayer", playerID => {
+    Event.$on("activePlayerChanged", playerID => {
       if (Number(playerID) === Number(this.playerID)) {
         this.color = "info";
       } else {
@@ -64,6 +82,12 @@ export default {
     },
     player: function(after, before) {
       this.settingsChanged();
+    },
+    selectedEvaluator: function(after, before) {
+      this.settingsChanged();
+    },
+    selectedCellSelector: function(after, before) {
+      this.settingsChanged();
     }
   },
   methods: {
@@ -71,7 +95,9 @@ export default {
       Event.$emit("settingsChanged", this.playerID, {
         type: this.player,
         algorithm: this.selectedAlgorithm,
-        depth: this.selectedDepth
+        depth: this.selectedDepth,
+        evaluator: this.selectedEvaluator,
+        selector: this.selectedCellSelector
       });
     }
   }

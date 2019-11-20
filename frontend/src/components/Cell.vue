@@ -9,16 +9,17 @@ export default {
   props: ["x", "y"],
   data() {
     return {
-      frozen: false,
+      frozen: true,
       mark: 0,
-      mouseOver: false
+      mouseOver: false,
+      activePlayer: 0
     };
   },
 
   methods: {
     strike(force) {
       if ((!this.frozen && !this.isMarked) || force) {
-        this.mark = this.$parent.activePlayer;
+        this.mark = this.activePlayer;
         this.frozen = true;
         Event.$emit("strike", this.x, this.y);
       }
@@ -32,24 +33,29 @@ export default {
   },
 
   created() {
+    Event.$on("activePlayerChanged", (activeId) => {
+      this.activePlayer = activeId;
+    })
+
     Event.$on("clearCells", () => {
       this.mark = 0;
       this.frozen = false;
     });
 
     Event.$on("markCell", (x, y) => {
-      if(this.x === x && this.y === y) {
-        this.strike(true)
+      if (this.x === x && this.y === y) {
+        this.strike(true);
       }
     });
 
-    Event.$on("disableUser", () => {
+    Event.$on("disableCells", () => {
       this.frozen = true;
-    })
+    });
 
-    Event.$on("enableUser", () => {
+    Event.$on("enableCells", (activePlayerId) => {
       this.frozen = false;
-    })
+      this.activePlayer = activePlayerId;
+    });
   },
   computed: {
     cellClass: function() {
@@ -57,13 +63,15 @@ export default {
         markA:
           this.mark === 1 ||
           (this.mouseOver === true &&
-            this.$parent.activePlayer === 1 &&
-            !this.frozen && !this.isMarked),
+            this.activePlayer === 1 &&
+            !this.frozen &&
+            !this.isMarked),
         markB:
           this.mark === 2 ||
           (this.mouseOver === true &&
-            this.$parent.activePlayer === 2 &&
-            !this.frozen && !this.isMarked)
+            this.activePlayer === 2 &&
+            !this.frozen &&
+            !this.isMarked)
       };
     },
     isMarked: function() {
