@@ -2,7 +2,7 @@ import axios from "axios";
 import * as Path from "./paths";
 
 const API = axios.create({
-  baseURL: Path.API_HEROKU_URL
+  baseURL: Path.API_LOCALHOST_URL
 });
 
 function nextMove(gameState) {
