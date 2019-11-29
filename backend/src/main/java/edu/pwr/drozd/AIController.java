@@ -3,9 +3,11 @@ package edu.pwr.drozd;
 import edu.pwr.drozd.algorithm.AlphaBetaAlgorithm;
 import edu.pwr.drozd.algorithm.MinMaxAlgorithm;
 import edu.pwr.drozd.algorithm.StrategoAIAlgorithm;
+import edu.pwr.drozd.cell_selector.BorderSelector;
 import edu.pwr.drozd.cell_selector.CellSelector;
 import edu.pwr.drozd.cell_selector.CentralSelector;
 import edu.pwr.drozd.evaluator.BoardStateEvaluator;
+import edu.pwr.drozd.evaluator.ClusterOfSymbolsEvaluator;
 import edu.pwr.drozd.evaluator.SymbolsInCompletedLinesEvaluator;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class AIController {
 
-    @CrossOrigin(origins = { "*" })
+    @CrossOrigin(origins = {"*"})
     @RequestMapping(value = "/", method = RequestMethod.GET, produces = "application/json")
     public GameState hello() {
         GameState gs = new GameState();
@@ -29,7 +31,7 @@ public class AIController {
         return gs;
     }
 
-    @CrossOrigin(origins = { "*" })
+    @CrossOrigin(origins = {"*"})
     @RequestMapping(value = "/nextMove", method = RequestMethod.POST, produces = "application/json")
     public ResponseEntity<int[]> nextMove(@RequestBody GameState gameState) {
         StrategoAIAlgorithm ai = getAlgorithm(gameState);
@@ -45,16 +47,20 @@ public class AIController {
 
     private BoardStateEvaluator getBoardStateEvaluator(@RequestBody GameState gameState) {
         BoardStateEvaluator stateEvaluator = null;
-        if ("symbols_in_completed_lines".equals(gameState.getStateEvaluator())) {
+        if ("Symbols in completed lines".equals(gameState.getStateEvaluator())) {
             stateEvaluator = new SymbolsInCompletedLinesEvaluator();
+        } else if ("Cluster of symbols".equals(gameState.getStateEvaluator())) {
+            stateEvaluator = new ClusterOfSymbolsEvaluator();
         }
         return stateEvaluator;
     }
 
     private CellSelector getCellSelector(@RequestBody GameState gameState) {
         CellSelector cellSelector = null;
-        if ("central".equals(gameState.getCellSelector())) {
+        if ("Central".equals(gameState.getCellSelector())) {
             cellSelector = new CentralSelector();
+        } else if ("Border".equals(gameState.getCellSelector())) {
+            cellSelector = new BorderSelector();
         }
         return cellSelector;
     }
